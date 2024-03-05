@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="drone_planning_ros" type="multirotor_keyboard_control.py" name="vehicle_keyboard" 
+        output="screen" args="iris 1 vel" />
+
+</launch>
+

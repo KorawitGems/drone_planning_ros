@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="vehicle" default="iris"/>
+  <arg name="ID" default="0"/>
+  <param name="/planner_to_mavros/state" type="bool" value="true"/>
+  <param name="/planner_to_mavros/restrict_yaw/state" type="bool" value="false"/>
+  <param name="/planner_to_mavros/restrict_yaw/value" type="double" value="0.0"/>
+  
+  <arg name="point_cloud_topic" default="/rtabmap/fusion_cloud"/>
+
+  <node pkg="drone_planning_ros" type="global_goal_plan_detect_markers.py" name="plan_goal_points" output="screen" args="iris 0" >  
+    <!-- sub -->
+    <remap from="current_pose" to="/$(arg vehicle)_$(arg ID)/mavros/local_position/pose"/>
+    <remap from="mandatory_stop" to="/mandatory_stop"/>
+    <!-- pub -->
+    <remap from="command/goal" to="/command/goal"/>
+  </node>
+
+  <group ns="global_planner">
+    <include file="$(find path_finder)/launch/sampling_global_planner.launch">
+      <!-- sub -->
+      <arg name="global_cloud_topic" value="$(arg point_cloud_topic)" />
+      <arg name="command_goal_topic" value="/command/goal" />
+      <arg name="current_pose_topic" value="/$(arg vehicle)_$(arg ID)/mavros/local_position/pose" />
+      <!-- pub -->
+      <arg name="output_cloud_topic" value="occ_map/cloud_map" />
+
+      <arg name="plan/time_up" value="false" />
+      <arg name="collision_check/collision_radius" value="1.0" /> <!-- use a little to neglect effect -->
+      <arg name="collision_check/radius_step" value="1.0" /> <!-- start_step = collision_radius ,then -= radius_step -->
+      <arg name="occupancy_grid/dynamics/range_x" value="1.0" /> <!-- delete old occupancy grid to update new grid -->
+      <arg name="occupancy_grid/dynamics/range_y" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_z" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_offset" value="-0.05" />
+      <arg name="occupancy_grid/cloud/publish" value="false" />
+      <arg name="inflation/radius" value="1.0"/>
+      <arg name="inflation/radius_step" value="1.0"/> <!-- start_step = 0 ,then += radius_step -->
+      <arg name="inflation/boundary" value="10.0"/>
+
+      <arg name="map_size_x" value="40"/>
+      <arg name="map_size_y" value="60"/>
+      <arg name="map_size_z" value="30"/>
+      <arg name="origin_x" value="-5.0" />
+      <arg name="origin_y" value="-30.0" />
+      <arg name="origin_z" value="0.0" />
+      <arg name="resolution" value="1.0" />
+
+      <arg name="steer_length" value="3.0" />
+      <arg name="search_radius" value="7.0" />
+      <arg name="search_time" value="1.0" />
+      <arg name="max_tree_node_nums" value="50000" />
+      <arg name="use_informed_sampling" value="true" />
+      <arg name="use_GUILD_sampling" value="false" />
+    </include>
+
+    <node pkg="drone_planning_ros" type="sampling_global_to_local_node" name="global_to_local" output="screen" args="iris 0" >    
+      <!-- sub -->
+      <remap from="path_planning" to="/global_planner/sampling_global_planner/brrt_final_path"/>
+      <remap from="current_pose" to="/$(arg vehicle)_$(arg ID)/mavros/local_position/pose"/>
+      <remap from="inflated_cloud_map" to="$(arg point_cloud_topic)"/>
+      <remap from="/command/goal" to="/command/goal"/>
+      <!-- pub -->
+      <remap from="/local_planner/goal" to="/local_planner/goal"/>
+
+    </node>
+
+  </group>
+
+  <group ns="local_planner">
+
+    <include file="$(find path_finder)/launch/sampling_local_planner.launch">
+      <!-- sub -->
+      <arg name="global_cloud_topic" value="$(arg point_cloud_topic)" />
+      <arg name="local_goal_topic" value="/local_planner/goal" />
+      <arg name="current_pose_topic" value="/$(arg vehicle)_$(arg ID)/mavros/local_position/pose" />
+      <!-- pub -->
+      <arg name="output_cloud_topic" value="occ_map/cloud_map" />
+
+      <arg name="collision_check/collision_radius" value="1.0" />
+      <arg name="collision_check/radius_step" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_x" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_y" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_z" value="1.0" />
+      <arg name="occupancy_grid/dynamics/range_offset" value="-0.05" />
+      <arg name="occupancy_grid/cloud/publish" value="true" /> <!-- debug occupancy_grid-->
+      <arg name="inflation/radius" value="1.0"/>
+      <arg name="inflation/radius_step" value="1.0"/>
+      <arg name="inflation/boundary" value="5.0"/>
+
+      <arg name="map_size_x" value="40"/>
+      <arg name="map_size_y" value="60"/>
+      <arg name="map_size_z" value="30"/>
+      <arg name="origin_x" value="-5.0" />
+      <arg name="origin_y" value="-30.0" />
+      <arg name="origin_z" value="0.0" />
+      <arg name="resolution" value="1.0" />
+
+      <arg name="steer_length" value="1.0" />
+      <arg name="search_radius" value="2.0" />
+      <arg name="search_time" value="0.5" />
+      <arg name="max_tree_node_nums" value="50000" />
+      <arg name="use_informed_sampling" value="true" />
+      <arg name="use_GUILD_sampling" value="false" />
+    </include>
+
+    <node pkg="drone_planning_ros" type="sampling_local_to_controller_node" name="local_to_controller" output="screen" args="iris 0" >    
+      <!-- sub -->
+      <remap from="path_planning" to="/local_planner/sampling_local_planner/brrt_star_final_path"/>
+      <remap from="current_pose" to="/$(arg vehicle)_$(arg ID)/mavros/local_position/pose"/>
+      <remap from="inflated_cloud_map" to="$(arg point_cloud_topic)"/>
+      <remap from="/command/goal" to="/command/goal"/>
+      <remap from="/local_planner/goal" to="/local_planner/goal"/>
+      <!-- pub to mavros communication-->
+
+    </node>
+  </group>
+
+</launch>

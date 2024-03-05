@@ -1,0 +1,8 @@
+# ignore ALL .log files
+*.log
+
+# ignore ALL files in ANY directory named backup
+backup/
+
+# ignore ALL files in ANY directory named test
+test/
