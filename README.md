@@ -1,9 +1,18 @@
 ## drone_planning_ros
 
 1. Integrate with drone simulation using PX4 and Gazebo.
-2. Integrate with multirotor keyboard and communication from XTDrone.
-3. Integrate with 3D SLAM rtabmap_ros.
-4. Integrate with planner from sampling-based-Guided.
+https://github.com/PX4/PX4-Autopilot/tree/release/1.13
+Add RGBD camera and 3D lidar to drone.
+
+3. Integrate with multirotor keyboard and communication from XTDrone.
+https://github.com/robin-shaun/XTDrone
+
+4. Integrate with 3D SLAM rtabmap_ros.
+https://github.com/introlab/rtabmap_ros
+
+5. Integrate with planner from sampling-based-Guided.
+Modified in https://github.com/KorawitGems/sampling-based-Guided
+
 
 # Installation
 
