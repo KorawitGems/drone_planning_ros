@@ -26,8 +26,8 @@
       <arg name="output_cloud_topic" value="occ_map/cloud_map" />
 
       <arg name="plan/time_up" value="false" />
-      <arg name="collision_check/collision_radius" value="1.0" /> <!-- use a little to neglect effect -->
-      <arg name="collision_check/radius_step" value="1.0" /> <!-- start_step = collision_radius ,then -= radius_step -->
+      <arg name="collision_check/collision_radius" value="0.0" /> <!-- use a little to neglect effect -->
+      <arg name="collision_check/radius_step" value="0.0" /> <!-- start_step = collision_radius ,then -= radius_step -->
       <arg name="occupancy_grid/dynamics/range_x" value="1.0" /> <!-- delete old occupancy grid to update new grid -->
       <arg name="occupancy_grid/dynamics/range_y" value="1.0" />
       <arg name="occupancy_grid/dynamics/range_z" value="1.0" />
@@ -76,15 +76,15 @@
       <!-- pub -->
       <arg name="output_cloud_topic" value="occ_map/cloud_map" />
 
-      <arg name="collision_check/collision_radius" value="1.0" />
-      <arg name="collision_check/radius_step" value="1.0" />
+      <arg name="collision_check/collision_radius" value="0.0" />
+      <arg name="collision_check/radius_step" value="0.0" />
       <arg name="occupancy_grid/dynamics/range_x" value="1.0" />
       <arg name="occupancy_grid/dynamics/range_y" value="1.0" />
       <arg name="occupancy_grid/dynamics/range_z" value="1.0" />
       <arg name="occupancy_grid/dynamics/range_offset" value="-0.05" />
       <arg name="occupancy_grid/cloud/publish" value="true" /> <!-- debug occupancy_grid-->
       <arg name="inflation/radius" value="1.0"/>
-      <arg name="inflation/radius_step" value="1.0"/>
+      <arg name="inflation/radius_step" value="0.5"/>
       <arg name="inflation/boundary" value="5.0"/>
 
       <arg name="map_size_x" value="40"/>
@@ -93,7 +93,7 @@
       <arg name="origin_x" value="-5.0" />
       <arg name="origin_y" value="-30.0" />
       <arg name="origin_z" value="0.0" />
-      <arg name="resolution" value="1.0" />
+      <arg name="resolution" value="0.5" />
 
       <arg name="steer_length" value="1.0" />
       <arg name="search_radius" value="2.0" />
